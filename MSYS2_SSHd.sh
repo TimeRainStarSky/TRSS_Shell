@@ -16,7 +16,11 @@ if test -f /etc/passwd; then
   mkgroup.exe -l > /etc/group
 fi
 cygrunsrv -R msys2_sshd
-cygrunsrv -I msys2_sshd -d "MSYS2 sshd" -p /usr/bin/sshd.exe -a "-D -e" -y tcpip
+echo ":start
+$(cygpath -w /usr/bin/sshd.exe) -D -e
+choice /t 5 /d y
+goto start" > /usr/bin/sshd.cmd
+cygrunsrv -I msys2_sshd -d "MSYS2 sshd" -p "$(command -v cmd.exe)" -a "//c $(cygpath -w /usr/bin/sshd.cmd)" -y tcpip
 if ! net start msys2_sshd; then
   echo "ERROR: Unable to start msys2_sshd service"
   exit 1
